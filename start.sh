@@ -7,5 +7,3 @@ ld -m elf_i386 -T link.ld -o kernel-os ./boot.o ./kernel.o
 cp kernel-os iso/boot/kernel
 grub-mkrescue -o bossy.iso iso
 qemu-system-i386 -cdrom bossy.iso
-
-qemu-system-i386 -kernel kernel-os
