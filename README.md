@@ -1,1 +1,1 @@
-# bossyOS
+# bossyOS 32bit
