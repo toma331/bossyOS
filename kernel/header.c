@@ -1,3 +1,4 @@
+#include <stdio.h>
 char *videomemory = (char*)0xb8000;
 unsigned int cursor = 0;
 
@@ -68,6 +69,15 @@ unsigned char keyboard_map[128] = {
     'z','x','c','v','b','n','m',',','.','/', 0, '*', 0,' ',
 };
 
+// --- массив команд ---
+char commands[5][128] = {
+    "help",
+    "hi",
+    "fetch",
+    "clear",
+    "poweroff",
+};
+
 // --- strcmp ---
 int strcmp(const char *s1, const char *s2) {
     while (*s1 && (*s1 == *s2)) {
@@ -123,7 +133,14 @@ void shell() {
 
                         // --- команды ---
                         if (!strcmp(buffer, "help")) {
-                            print("Commands: help, clear, hi, fetch , poweroff \n");
+                            print("Commands: ");
+                            put_char('\n');
+                            put_char('\n');
+                            for (int j = 0; j < 5; j++) {
+                                print(commands[j]); 
+                                put_char('\n');
+                            }
+                            put_char('\n');
                         }else if (!strcmp(buffer, "poweroff")) {
                             print("Powering off...\n");
                             outw(0x604, 0x2000); // QEMU поймёт и выключится
