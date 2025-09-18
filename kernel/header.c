@@ -91,6 +91,11 @@ void fetch() {
     print("\n");
 }
 
+// --- outw ---
+static inline void outw(unsigned short port, unsigned short val) {
+    asm volatile ( "outw %0, %1" : : "a"(val), "Nd"(port) );
+}
+
 // --- shell ---
 void shell() {
     char buffer[128];
@@ -118,8 +123,12 @@ void shell() {
 
                         // --- команды ---
                         if (!strcmp(buffer, "help")) {
-                            print("Commands: help, clear, hi, fetch\n");
-                        } else if (!strcmp(buffer, "clear")) {
+                            print("Commands: help, clear, hi, fetch , poweroff \n");
+                        }else if (!strcmp(buffer, "poweroff")) {
+                            print("Powering off...\n");
+                            outw(0x604, 0x2000); // QEMU поймёт и выключится
+                            for (;;); // на случай, если не сработало
+                        }else if (!strcmp(buffer, "clear")) {
                             clearScreen();
                         } else if (!strcmp(buffer, "hi")) {
                             print("Hello from bossyOS shell!\n");
