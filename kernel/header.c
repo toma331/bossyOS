@@ -1,4 +1,3 @@
-#include <stdio.h>
 char *videomemory = (char*)0xb8000;
 unsigned int cursor = 0;
 
