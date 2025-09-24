@@ -6,5 +6,5 @@ gcc -m32 -c ./kernel/header.c -o ./build/kernel.o
 
 ld -m elf_i386 -T link.ld -o ./build/kernel.elf ./build/boot.o ./build/kernel.o
 
-cp kernel.elf iso/boot/kernel
+cp ./build/kernel.elf iso/boot/kernel
 grub-mkrescue -o bossy.iso iso
