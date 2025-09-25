@@ -1,64 +1,8 @@
-char *videomemory = (char*)0xb8000;
-unsigned int cursor = 0;
-
-// --- работа с портами ---
-unsigned char inb(unsigned short port) {
-    unsigned char r;
-    __asm__ __volatile__("inb %1, %0" : "=a"(r) : "Nd"(port));
-    return r;
-}
-
-void outb(unsigned short port, unsigned char val) {
-    __asm__ __volatile__("outb %0, %1" : : "a"(val), "Nd"(port));
-}
-
-// --- курсор VGA ---
-void set_cursor(unsigned short index) {
-    outb(0x3D4, 0x0F);
-    outb(0x3D5, (unsigned char)(index & 0xFF));
-    outb(0x3D4, 0x0E);
-    outb(0x3D5, (unsigned char)((index >> 8) & 0xFF));
-}
-
-void enable_cursor(unsigned char start, unsigned char end) {
-    outb(0x3D4, 0x0A);
-    outb(0x3D5, (inb(0x3D5) & 0xC0) | start);
-
-    outb(0x3D4, 0x0B);
-    outb(0x3D5, (inb(0x3D5) & 0xE0) | end);
-}
-
-void update_cursor() {
-    set_cursor(cursor / 2);
-}
-
-// --- вывод на экран ---
-void put_char(char c) {
-    if (c == '\n') {
-        unsigned int line = cursor / (80 * 2);
-        cursor = (line + 1) * 80 * 2;
-    } else {
-        videomemory[cursor] = c;
-        videomemory[cursor + 1] = 0x07;
-        cursor += 2;
-    }
-    update_cursor();
-}
-
-void print(const char *str) {
-    while (*str) {
-        put_char(*str++);
-    }
-}
-
-void clearScreen() {
-    for (unsigned int j = 0; j < 80 * 25 * 2; j += 2) {
-        videomemory[j] = ' ';
-        videomemory[j + 1] = 0x07;
-    }
-    cursor = 0;
-    update_cursor();
-}
+#include "screen.h"
+#include "ports.h"
+#include "variables.h"
+#include "cursor.h"
+#include "fetch.h"
 
 // --- клавиатура ---
 unsigned char keyboard_map[128] = {
@@ -84,25 +28,6 @@ int strcmp(const char *s1, const char *s2) {
         s2++;
     }
     return *(unsigned char *)s1 - *(unsigned char *)s2;
-}
-
-// --- bossyOS fetch ---
-void fetch() {
-    print("   ____                 \n");
-    print("  | __ )  ___  ___  ___ \n");
-    print("  |  _ \\ / _ \\/ __|/ _ \\\n");
-    print("  | |_) | (_) \\__ \\  __/\n");
-    print("  |____/ \\___/|___/\\___|\n");
-    print("\n");
-    print(" bossyOS v0.1 (toy kernel)\n");
-    print(" VGA Text Mode 80x25\n");
-    print(" Author: Artem Koval :)\n");
-    print("\n");
-}
-
-// --- outw ---
-static inline void outw(unsigned short port, unsigned short val) {
-    asm volatile ( "outw %0, %1" : : "a"(val), "Nd"(port) );
 }
 
 // --- shell ---
@@ -165,11 +90,3 @@ void shell() {
         }
     }
 }
-
-void bossyOS(void) {
-    clearScreen();
-    enable_cursor(0, 15);
-    print("hello from bossyOS\n\n");
-    shell();
-}
-
