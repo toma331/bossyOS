@@ -1,6 +1,6 @@
-#include "screen.h"
-#include "cursor.h"
-#include "shell.h"
+#include "headers/screen.h"
+#include "headers/cursor.h"
+#include "headers/shell.h"
 
 void bossyOS(void) {
     clearScreen();

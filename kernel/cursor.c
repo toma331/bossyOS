@@ -1,5 +1,5 @@
-#include "ports.h"
-#include "variables.h"
+#include "headers/ports.h"
+#include "headers/variables.h"
 
 // --- курсор VGA ---
 void set_cursor(unsigned short index) {

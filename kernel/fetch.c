@@ -1,5 +1,5 @@
-#include "fetch.h"
-#include "screen.h"
+#include "headers/fetch.h"
+#include "headers/screen.h"
 
 void fetch() {
     print("   ____                 \n");

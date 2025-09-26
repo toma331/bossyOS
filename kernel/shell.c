@@ -1,25 +1,8 @@
-#include "screen.h"
-#include "ports.h"
-#include "variables.h"
-#include "cursor.h"
-#include "fetch.h"
-
-// --- клавиатура ---
-unsigned char keyboard_map[128] = {
-    0, 27, '1','2','3','4','5','6','7','8','9','0','-','=', '\b',
-    '\t','q','w','e','r','t','y','u','i','o','p','[',']','\n', 0,
-    'a','s','d','f','g','h','j','k','l',';','\'','`', 0,'\\',
-    'z','x','c','v','b','n','m',',','.','/', 0, '*', 0,' ',
-};
-
-// --- массив команд ---
-char commands[5][128] = {
-    "help",
-    "hi",
-    "fetch",
-    "clear",
-    "poweroff",
-};
+#include "headers/screen.h"
+#include "headers/ports.h"
+#include "headers/variables.h"
+#include "headers/cursor.h"
+#include "headers/fetch.h"
 
 // --- strcmp ---
 int strcmp(const char *s1, const char *s2) {

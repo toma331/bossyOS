@@ -1,6 +1,6 @@
-#include "screen.h"
-#include "cursor.h"
-#include "variables.h"
+#include "headers/screen.h"
+#include "headers/cursor.h"
+#include "headers/variables.h"
 
 // --- вывод на экран ---
 void put_char(char c) {
