@@ -10,6 +10,7 @@ gcc -m32 -c ./kernel/screen.c -o ./build/screen.o
 gcc -m32 -c ./kernel/shell.c -o ./build/shell.o
 gcc -m32 -c ./kernel/variables.c -o ./build/variables.o
 gcc -m32 -c ./kernel/fetch.c -o ./build/fetch.o
+gcc -m32 -c ./kernel/calc.c -o ./build/calc.o
 
 ld -m elf_i386 -T link.ld -o ./build/kernel.elf ./build/*.o
 cp ./build/kernel.elf iso/boot/kernel
