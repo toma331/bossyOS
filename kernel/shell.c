@@ -13,7 +13,9 @@ void shell() {
 	char buffer[128];
 	int len = 0;
 
-	print("bossyOS> ");
+	print("=^.-.^=");
+    put_char('\n');
+    print("-> ");
 
 	while (1) {
 		if (inb(0x64) & 1) {
@@ -90,7 +92,9 @@ void shell() {
 				}
 
 				len = 0;
-				print("bossyOS> ");
+				print("=^.-.^=");
+                put_char('\n');
+				print("-> ");
 			} else {
 				put_char(c);
 				buffer[len++] = c;
