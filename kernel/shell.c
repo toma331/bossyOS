@@ -13,7 +13,7 @@ void shell() {
 	char buffer[128];
 	int len = 0;
 
-	print("=^.-.^=");
+	print("=^._.^=");
     put_char('\n');
     print("-> ");
 
@@ -92,7 +92,7 @@ void shell() {
 				}
 
 				len = 0;
-				print("=^.-.^=");
+				print("=^._.^=");
                 put_char('\n');
 				print("-> ");
 			} else {

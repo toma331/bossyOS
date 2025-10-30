@@ -14,5 +14,4 @@ gcc -m32 -c ./kernel/calc.c -o ./build/calc.o
 
 ld -m elf_i386 -T link.ld -o ./build/kernel.elf ./build/*.o
 cp ./build/kernel.elf iso/boot/kernel
-grub-mkrescue -o bossy.iso iso
-qemu-system-i386 -cdrom bossy.iso
+qemu-system-i386 -kernel iso/boot/kernel

@@ -3,6 +3,7 @@
 unsigned int cursor = 0;
 char *videomemory = (char*)0xb8000;
 
+
 // --- клавиатура ---
 unsigned char keyboard_map[128] = {
     0, 27, '1','2','3','4','5','6','7','8','9','0','-','=', '\b',
