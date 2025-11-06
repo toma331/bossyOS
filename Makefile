@@ -44,6 +44,7 @@ $(ISO): $(KERNEL)
 # Clean build files
 clean:
 	rm -rf $(BUILD) $(ISO)
+	rm iso/boot/kernel
 
 .PHONY: all clean
 

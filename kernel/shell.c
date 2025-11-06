@@ -1,104 +1,124 @@
-#include "headers/calc.h"
 #include "headers/cursor.h"
 #include "headers/fetch.h"
 #include "headers/ports.h"
 #include "headers/screen.h"
 #include "headers/variables.h"
+#include "headers/fs.h"
+#include "headers/calc.h"
 
-static int shift_pressed = 0;
-unsigned char last_scancode = 0;
+#include <stddef.h>
 
-// --- shell ---
 void shell() {
-	char buffer[128];
-	int len = 0;
+    char buffer[128];
+    int len = 0;
+    last_scancode = 0;
+    shift_pressed = 0;
 
-	print("=^.-.^=");
+    print("=^.-.^=");
     put_char('\n');
     print("-> ");
 
-	while (1) {
-		if (inb(0x64) & 1) {
-			unsigned char scancode = inb(0x60);
+    while (1) {
+        if (inb(0x64) & 1) {
+            unsigned char scancode = inb(0x60);
 
-			// игнорируем повторное чтение того же кода
-			if (scancode == last_scancode)
-				continue;
-			last_scancode = scancode;
+            // клавиша отпущена?
+            if (scancode & 0x80) {
+                unsigned char released = scancode & 0x7F;
+                if (released == 0x2A || released == 0x36) {
+                    shift_pressed = 0;
+                }
+                // Можно сбросить last_scancode, чтобы не мешать
+                last_scancode = 0;
+                continue;
+            }
 
-			// клавиша отпущена?
-			if (scancode & 0x80) {
-				unsigned char released = scancode & 0x7F;
+            // ignore repetitions? можно убрать или минимально использовать:
+            if (scancode == last_scancode)
+                continue;
+            last_scancode = scancode;
 
-				// если отпущен Shift
-				if (released == 0x2A || released == 0x36) {
-					shift_pressed = 0;
-				}
-				continue; // не печатаем break-коды!
-			}
+            // Если Shift
+            if (scancode == 0x2A || scancode == 0x36) {
+                shift_pressed = 1;
+                continue;
+            }
 
-			// клавиша нажата
-			if (scancode == 0x2A || scancode == 0x36) { // Shift
-				shift_pressed = 1;
-				continue;
-			}
+            char c = shift_pressed ? shift_keyboard_map[scancode] : keyboard_map[scancode];
+            if (!c) continue;
 
-			char c;
-			if (shift_pressed)
-				c = shift_keyboard_map[scancode];
-			else
-				c = keyboard_map[scancode];
-
-			if (!c)
-				continue;
-
-			// обработка символа
-			if (c == '\b') {
-				if (len > 0) {
-					len--;
-					cursor -= 2;
-					videomemory[cursor] = ' ';
-					update_cursor();
-				}
-			} else if (c == '\n') {
-				buffer[len] = 0;
-				put_char('\n');
-
-				// --- команды ---
-				if (!strcmp(buffer, "help")) {
-					print("Commands: ");
-					put_char('\n');
-					put_char('\n');
-					for (int j = 0; j < 6; j++) {
-						print(commands[j]);
-						put_char('\n');
-					}
-					put_char('\n');
-				} else if (!strcmp(buffer, "poweroff")) {
-					print("Powering off...\n");
-					outw(0x604, 0x2000); // QEMU поймёт и выключится
-					for (;;)
-						; // на случай, если не сработало
-				} else if (!strcmp(buffer, "clear")) {
-					clearScreen();
-				} else if (!strcmp(buffer, "hi")) {
-					print("Hello from bossyOS shell!\n");
-				} else if (!strcmp(buffer, "fetch")) {
-					fetch();
-				} else if (!strcmp(buffer, "calc")) {
-					calc();
-				} else {
-					print("Unknown command\n");
-				}
-
-				len = 0;
-				print("=^.-.^=");
+            if (c == '\b') {
+                if (len > 0) {
+                    len--;
+                    // Простейшее управление курсором/видеопамятью:
+                    if (cursor >= 2) cursor -= 2;
+                    videomemory[cursor] = ' ';
+                    update_cursor();
+                }
+            } else if (c == '\n' || c == '\r') {
+                buffer[len] = '\0';
                 put_char('\n');
-				print("-> ");
-			} else {
-				put_char(c);
-				buffer[len++] = c;
-			}
-		}
-	}
+
+                // ОБРАБОТКА КОМАНД
+                if (strcmp(buffer, "help") == 0) {
+                    print("Commands:\n");
+                    for (int j = 0; j < 6; j++) {
+                        print(commands[j]);
+                        put_char('\n');
+                    }
+                    put_char('\n');
+                    print("[  FS COMMANDS  ]");
+                    for (int i = 6; i < 9; i++) {
+                        put_char('\n');
+                        print(commands[i]);
+                    }
+                    put_char('\n');
+                } else if (strcmp(buffer, "poweroff") == 0) {
+                    print("Powering off...\n");
+                    outw(0x604, 0x2000);
+                    for(;;);
+                } else if (strcmp(buffer, "clear") == 0) {
+                    clearScreen();
+                } else if (strcmp(buffer, "hi") == 0) {
+                    print("Hello from bossyOS shell!\n");
+                } else if (strcmp(buffer, "fetch") == 0) {
+                    fetch();
+                } else if (strncmp(buffer, "ls", 2) == 0 && (buffer[2] == '\0' || buffer[2] == ' ')) {
+                    ls_fs();
+                } else if (strncmp(buffer, "mkdir ", 6) == 0) {
+                    char *arg = buffer + 6;
+                    while (*arg == ' ') arg++;
+                    if (*arg) mkdir_fs(arg);
+                    else print("mkdir: missing operand\n");
+                } else if (strncmp(buffer, "touch ", 6) == 0) {
+                    char *arg = buffer + 6;
+                    while (*arg == ' ') arg++;
+                    if (*arg) touch_fs(arg);
+                    else print("touch: missing operand\n");
+
+                } else if (strcmp(buffer, "calc") == 0) {
+                    calc();
+                } else {
+                    print("Unknown command\n");
+                }
+
+                // сброс буфера и вывод приглашения
+                len = 0;
+                buffer[0] = '\0';
+
+                put_char('\n');
+                print("=^.-.^=");
+                put_char('\n');
+                print("-> ");
+            } else {
+                // печатаемые символы
+                if (len < (int)sizeof(buffer) - 1) {
+                    put_char(c);
+                    buffer[len++] = c;
+                } else {
+                    // буфер переполнен — можно пищать или игнорировать
+                }
+            }
+        }
+    }
 }

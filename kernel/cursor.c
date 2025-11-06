@@ -1,7 +1,7 @@
 #include "headers/ports.h"
 #include "headers/variables.h"
 
-// --- курсор VGA ---
+// курсор VGA
 void set_cursor(unsigned short index) {
     outb(0x3D4, 0x0F);
     outb(0x3D5, (unsigned char)(index & 0xFF));
