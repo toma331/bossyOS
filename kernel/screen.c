@@ -2,7 +2,7 @@
 #include "headers/cursor.h"
 #include "headers/variables.h"
 
-// --- вывод на экран ---
+// вывод на экран
 void put_char(char c) {
     if (c == '\n') {
         unsigned int line = cursor / (80 * 2);
