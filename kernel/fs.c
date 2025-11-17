@@ -28,7 +28,6 @@ void *memset(void *dest, int value, size_t count) {
     return dest;
 }
 
-
 typedef enum {
     FILE_TYPE,
     DIR_TYPE
@@ -106,6 +105,7 @@ void mkdir_fs(const char *name) {
     inodes[inode_num].block = block_num;
     dir_block_t *dir = (dir_block_t*)blocks[block_num];
     dir->count = 0;
+    put_char('\n');
     add_dir_entry(root_dir, name, inode_num);
 }
 
@@ -115,6 +115,7 @@ void touch_fs(const char *name) {
     if(inode_num < 0) { print("Нет свободных inode\n"); return; }
     int block_num = inode_num; // для простоты
     inodes[inode_num].block = block_num;
+    put_char('\n');
     add_dir_entry(root_dir, name, inode_num);
 }
 
@@ -126,7 +127,7 @@ void ls_fs() {
         char *type = inodes[inode_num].type == DIR_TYPE ? "DIR" : "FILE";
 
         print(root_dir->entries[i].name);
-        put_char('\n');
         print(type);
+        put_char('\n');
     }
 }

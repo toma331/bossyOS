@@ -95,7 +95,6 @@ void shell() {
                     while (*arg == ' ') arg++;
                     if (*arg) touch_fs(arg);
                     else print("touch: missing operand\n");
-
                 } else if (strcmp(buffer, "calc") == 0) {
                     calc();
                 } else {
