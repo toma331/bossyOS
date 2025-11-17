@@ -33,7 +33,7 @@ char cgetch() {
 void kgets(char *buf, int max_len) {
     int i = 0;
     while (i < max_len - 1) {
-        char c = cgetch(); // Ваша функция чтения символа с клавиатуры
+        char c = cgetch();
         if (c == '\n' || c == '\r') {
             buf[i] = '\0';
             put_char('\n');
