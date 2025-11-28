@@ -21,10 +21,9 @@ char cgetch() {
     unsigned char scancode = 0;
     char c = 0;
 
-    // Ждём, пока клавиша нажата (бит 0 в порту 0x64)
     do {
         scancode = inb(0x60);
-    } while (scancode & 0x80); // игнорируем отпускание клавиши (release event)
+    } while (scancode & 0x80); 
 
     c = keyboard_map[scancode];
     return c;
@@ -41,7 +40,7 @@ void kgets(char *buf, int max_len) {
         } else if (c == '\b' && i > 0) {
             i--;
             put_char('\b');
-        } else if (c >= 32 && c <= 126) { // печатаемые символы
+        } else if (c >= 32 && c <= 126) {
             buf[i++] = c;
             put_char(c);
         }

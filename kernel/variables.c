@@ -6,7 +6,6 @@ char *videomemory = (char*)0xb8000;
 int shift_pressed = 0;
 unsigned char last_scancode = 0;
 
-// клавиатура
 unsigned char keyboard_map[128] = {
     0, 27, '1','2','3','4','5','6','7','8','9','0','-','=', '\b',
     '\t','q','w','e','r','t','y','u','i','o','p','[',']','\n', 0,
@@ -24,7 +23,6 @@ char shift_keyboard_map[128] = {
 };
 
 
-// массив команд
 char commands[9][128] = {
     "help",
     "hi",

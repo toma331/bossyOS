@@ -2,7 +2,6 @@
 #include "headers/cursor.h"
 #include "headers/variables.h"
 
-// вывод на экран
 void put_char(char c) {
     if (c == '\n') {
         unsigned int line = cursor / (80 * 2);
@@ -30,7 +29,6 @@ void clearScreen() {
     update_cursor();
 }
 
-// strcmp
 int strcmp(const char *s1, const char *s2) {
     while (*s1 && (*s1 == *s2)) {
         s1++;

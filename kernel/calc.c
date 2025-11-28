@@ -27,7 +27,6 @@ void print_int(int num) {
     if (is_negative)
         put_char('-');
 
-    // выводим в обратном порядке
     for (int j = i - 1; j >= 0; j--) {
         put_char(str[j]);
     }
@@ -45,12 +44,10 @@ void calc() {
         if (inb(0x64) & 1) {
             unsigned char scancode = inb(0x60);
 
-            // Игнорируем повторные коды
             if (scancode == last_scancode)
                 continue;
             last_scancode = scancode;
 
-            // Отпуск клавиши
             if (scancode & 0x80) {
                 unsigned char released = scancode & 0x7F;
                 if (released == 0x2A || released == 0x36)
@@ -58,19 +55,16 @@ void calc() {
                 continue;
             }
 
-            // Shift нажат
             if (scancode == 0x2A || scancode == 0x36) {
                 shift_pressed = 1;
                 continue;
             }
 
-            // Получаем символ из таблицы
             char c = shift_pressed ? shift_keyboard_map[scancode]
                                    : keyboard_map[scancode];
 
             if (!c) continue;
 
-            // Обработка символов
             if (c == '\n') {
                 expr[expr_len] = 0;
                 put_char('\n');
@@ -89,21 +83,17 @@ void calc() {
         }
     }
 
-    // парсер "число оператор число"
     int a = 0, b = 0;
     char op = 0;
     int i = 0;
 
-    // парсим первое число
     while (expr[i] >= '0' && expr[i] <= '9') {
         a = a * 10 + (expr[i] - '0');
         i++;
     }
 
-    // оператор
     op = expr[i++];
 
-    // второе число
     while (expr[i] >= '0' && expr[i] <= '9') {
         b = b * 10 + (expr[i] - '0');
         i++;

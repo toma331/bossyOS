@@ -1,5 +1,4 @@
 #include "headers/cursor.h"
-#include "headers/fetch.h"
 #include "headers/ports.h"
 #include "headers/screen.h"
 #include "headers/variables.h"
@@ -7,6 +6,8 @@
 #include "headers/calc.h"
 
 #include <stddef.h>
+
+void fetch();
 
 void shell() {
     char buffer[128];
@@ -22,23 +23,19 @@ void shell() {
         if (inb(0x64) & 1) {
             unsigned char scancode = inb(0x60);
 
-            // клавиша отпущена?
             if (scancode & 0x80) {
                 unsigned char released = scancode & 0x7F;
                 if (released == 0x2A || released == 0x36) {
                     shift_pressed = 0;
                 }
-                // Можно сбросить last_scancode, чтобы не мешать
                 last_scancode = 0;
                 continue;
             }
 
-            // ignore repetitions? можно убрать или минимально использовать:
             if (scancode == last_scancode)
                 continue;
             last_scancode = scancode;
 
-            // Если Shift
             if (scancode == 0x2A || scancode == 0x36) {
                 shift_pressed = 1;
                 continue;
@@ -50,7 +47,6 @@ void shell() {
             if (c == '\b') {
                 if (len > 0) {
                     len--;
-                    // Простейшее управление курсором/видеопамятью:
                     if (cursor >= 2) cursor -= 2;
                     videomemory[cursor] = ' ';
                     update_cursor();
@@ -59,7 +55,6 @@ void shell() {
                 buffer[len] = '\0';
                 put_char('\n');
 
-                // ОБРАБОТКА КОМАНД
                 if (strcmp(buffer, "help") == 0) {
                     print("Commands:\n");
                     for (int j = 0; j < 6; j++) {
@@ -101,7 +96,6 @@ void shell() {
                     print("Unknown command\n");
                 }
 
-                // сброс буфера и вывод приглашения
                 len = 0;
                 buffer[0] = '\0';
 
@@ -110,12 +104,11 @@ void shell() {
                 put_char('\n');
                 print("-> ");
             } else {
-                // печатаемые символы
                 if (len < (int)sizeof(buffer) - 1) {
                     put_char(c);
                     buffer[len++] = c;
                 } else {
-                    // буфер переполнен — можно пищать или игнорировать
+
                 }
             }
         }

@@ -1,12 +1,11 @@
-#include "./headers/screen.h"
+#include "headers/fs.h"
+#include "headers/screen.h"
 
 #include <stdint.h>
 #include <stddef.h>
 
-#define BLOCK_SIZE 1024
-#define MAX_FILES 128
-#define MAX_NAME 32
 #define MAX_BLOCKS 128
+#define BLOCK_SIZE 1024
 
 #define MEM_OK 0
 #define MEM_ERROR 1
@@ -28,36 +27,13 @@ void *memset(void *dest, int value, size_t count) {
     return dest;
 }
 
-typedef enum {
-    FILE_TYPE,
-    DIR_TYPE
-} inode_type;
 
-typedef struct {
-    inode_type type;
-    int size;
-    int block; // индекс блока данных
-} inode_t;
-
-typedef struct {
-    char name[MAX_NAME];
-    int inode_number;
-} dir_entry_t;
-
-typedef struct {
-    dir_entry_t entries[MAX_FILES];
-    int count;
-} dir_block_t;
-
-
-// Файловая система в памяти
 inode_t inodes[MAX_FILES];
 int free_inodes[MAX_FILES];
 char blocks[MAX_BLOCKS][BLOCK_SIZE];
 dir_block_t *root_dir;
 
 
-// Инициализация FS
 void init_fs() {
     memset(inodes, 0, sizeof(inodes));
 
@@ -72,7 +48,6 @@ void init_fs() {
     free_inodes[0] = 0;
 }
 
-// Выделение нового inode
 int allocate_inode(inode_type type) {
     for(int i=0;i<MAX_FILES;i++) {
         if(free_inodes[i]) {
@@ -86,7 +61,6 @@ int allocate_inode(inode_type type) {
     return -1;
 }
 
-// Добавление файла или папки в директорию
 int add_dir_entry(dir_block_t *dir, const char *name, int inode_num) {
     if(dir->count >= MAX_FILES) return -1;
     strncpy(dir->entries[dir->count].name, name, MAX_NAME - 1);
@@ -97,11 +71,10 @@ int add_dir_entry(dir_block_t *dir, const char *name, int inode_num) {
     return 0;
 }
 
-// mkdir
 void mkdir_fs(const char *name) {
     int inode_num = allocate_inode(DIR_TYPE);
     if(inode_num < 0) { print("Нет свободных inode\n"); return; }
-    int block_num = inode_num; // для простоты
+    int block_num = inode_num; 
     inodes[inode_num].block = block_num;
     dir_block_t *dir = (dir_block_t*)blocks[block_num];
     dir->count = 0;
@@ -109,17 +82,15 @@ void mkdir_fs(const char *name) {
     add_dir_entry(root_dir, name, inode_num);
 }
 
-// touch
 void touch_fs(const char *name) {
     int inode_num = allocate_inode(FILE_TYPE);
     if(inode_num < 0) { print("Нет свободных inode\n"); return; }
-    int block_num = inode_num; // для простоты
+    int block_num = inode_num; 
     inodes[inode_num].block = block_num;
     put_char('\n');
     add_dir_entry(root_dir, name, inode_num);
 }
 
-// ls
 void ls_fs() {
     for(int i=0;i<root_dir->count;i++) {
         int inode_num = root_dir->entries[i].inode_number;

@@ -1,6 +1,5 @@
 #include "headers/ports.h"
 
-// работа с портами
 unsigned char inb(unsigned short port) {
     unsigned char r;
     __asm__ __volatile__("inb %1, %0" : "=a"(r) : "Nd"(port));
