@@ -33,7 +33,7 @@ void print_int(int num) {
 }
 
 void calc() {
-    print("Enter expression (example: 2+2): ");
+    print("Enter expression --> ");
 
     char expr[64];
     int expr_len = 0;

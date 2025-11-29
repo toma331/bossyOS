@@ -15,9 +15,7 @@ void shell() {
     last_scancode = 0;
     shift_pressed = 0;
 
-    print("=^.-.^=");
-    put_char('\n');
-    print("-> ");
+    print("--> ");
 
     while (1) {
         if (inb(0x64) & 1) {
@@ -92,6 +90,8 @@ void shell() {
                     else print("touch: missing operand\n");
                 } else if (strcmp(buffer, "calc") == 0) {
                     calc();
+                } else if (strcmp(buffer, "") == 0) {
+
                 } else {
                     print("Unknown command\n");
                 }
@@ -100,9 +100,7 @@ void shell() {
                 buffer[0] = '\0';
 
                 put_char('\n');
-                print("=^.-.^=");
-                put_char('\n');
-                print("-> ");
+                print("--> ");
             } else {
                 if (len < (int)sizeof(buffer) - 1) {
                     put_char(c);

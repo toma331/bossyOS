@@ -8,7 +8,7 @@ void put_char(char c) {
         cursor = (line + 1) * 80 * 2;
     } else {
         videomemory[cursor] = c;
-        videomemory[cursor + 1] = 0x07;
+        videomemory[cursor + 1] = (0x01 << 4) | 0x07; 
         cursor += 2;
     }
     update_cursor();
@@ -23,7 +23,7 @@ void print(const char *str) {
 void clearScreen() {
     for (unsigned int j = 0; j < 80 * 25 * 2; j += 2) {
         videomemory[j] = ' ';
-        videomemory[j + 1] = 0x07;
+        videomemory[j + 1] = (0x01 << 4) | 0x07;
     }
     cursor = 0;
     update_cursor();
