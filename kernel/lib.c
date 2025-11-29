@@ -1,49 +1,61 @@
-#include "headers/variables.h"
 #include "headers/ports.h"
 #include "headers/screen.h"
+#include "headers/variables.h"
 
 #include <stddef.h>
 
-size_t strcspn(const char *s, const char *reject) {
-    const char *p, *r;
+size_t strcspn(const char *s, const char *reject)
+{
+	const char *p, *r;
 
-    for (p = s; *p; p++) {
-        for (r = reject; *r; r++) {
-            if (*p == *r)
-                return p - s;
-        }
-    }
+	for (p = s; *p; p++)
+	{
+		for (r = reject; *r; r++)
+		{
+			if (*p == *r)
+				return p - s;
+		}
+	}
 
-    return p - s;
+	return p - s;
 }
 
-char cgetch() {
-    unsigned char scancode = 0;
-    char c = 0;
+char cgetch()
+{
+	unsigned char scancode = 0;
+	char c = 0;
 
-    do {
-        scancode = inb(0x60);
-    } while (scancode & 0x80); 
+	do
+	{
+		scancode = inb(0x60);
+	} while (scancode & 0x80);
 
-    c = keyboard_map[scancode];
-    return c;
+	c = keyboard_map[scancode];
+	return c;
 }
 
-void kgets(char *buf, int max_len) {
-    int i = 0;
-    while (i < max_len - 1) {
-        char c = cgetch();
-        if (c == '\n' || c == '\r') {
-            buf[i] = '\0';
-            put_char('\n');
-            return;
-        } else if (c == '\b' && i > 0) {
-            i--;
-            put_char('\b');
-        } else if (c >= 32 && c <= 126) {
-            buf[i++] = c;
-            put_char(c);
-        }
-    }
-    buf[i] = '\0';
+void kgets(char *buf, int max_len)
+{
+	int i = 0;
+	while (i < max_len - 1)
+	{
+		char c = cgetch();
+		if (c == '\n' || c == '\r')
+		{
+			buf[i] = '\0';
+			put_char('\n');
+			return;
+		}
+		else if (c == '\b' && i > 0)
+		{
+			i--;
+			put_char('\b');
+		}
+		else if (c >= 32 && c <= 126)
+		{
+			buf[i++] = c;
+			put_char(c);
+		}
+	}
+	buf[i] = '\0';
 }
